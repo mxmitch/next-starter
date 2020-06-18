@@ -1,8 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import sqlite from "sqlite";
 
-export default function getAllVehiclesByPersonId(
+export default async function getVehicleById(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  res.json({ byId: req.query.id, message: "getAllVehiclesByPersonId" });
+  const db = await sqlite.open("./mydb.sqlite");
+  const allVehicles = await db.all("SELECT * FROM vehicle WHERE ownerId = ?", [
+    req.query.id
+  ]);
+  res.json(allVehicles);
 }

@@ -1,12 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import sqlite from "sqlite";
 
-export default function getAllVehicles(
+export default async function getVehicle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "GET") {
-    res.status(500).json({ message: "sorry we only accept GET requests" });
-  }
-
-  res.json({ hello: "world", method: req.method });
+  const db = await sqlite.open("./mydb.sqlite");
+  const vehicles = await db.all("SELECT * FROM vehicle");
+  res.json(vehicles);
 }

@@ -1,8 +1,26 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import sqlite from "sqlite";
 
-export default function getPersonById(
+export default async function getPersonById(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  res.json({ byId: req.query.id, message: "getPersonById" });
+  const db = await sqlite.open("./mydb.sqlite");
+
+  if (req.method === "PUT") {
+    const statement = await db.prepare(
+      "UPDATE person SET name= ?, email = ?, where id = ?"
+    );
+    const result = await statement.run(
+      req.body.name,
+      req.body.email,
+      req.query.id
+    );
+    result.finalize();
+  }
+
+  const person = await db.get("SELECT * FROM Person WHERE id = ?", [
+    req.query.id
+  ]);
+  res.json(person);
 }
